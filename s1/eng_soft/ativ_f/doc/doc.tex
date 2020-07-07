@@ -79,28 +79,57 @@ reuniões física.
 
 Após confirmado o recebimento do email de teste, foi levantado algumas questões
 para extrair informações que ajudariam no desenvolvimento das funcionalidades do 
-sistema e depois foram enviadas (03/07/2020), porêm as respostas não foram recebidas 
-por nossos servidores de email como pode ser visto no log abaixo.\\
+sistema e depois foram enviadas (03/07/2020), o log da conversa pode ser visto abaixo:\\
+
+Date: Tue, 7 Jul 2020 16:05:36 -0300\\
+From: Luciano Albuquerque Lima Saraiva <llsaraiva@unaerp.br>\\
+To: Murilo Ijanc' <mbsd@m0x.ru>\\
+Subject: Re: Teste\\
+
+1- . Atualmente existe alguma forma de substituir a poltrona caso tenha\\
+escolhido errada?\\
+Após fechada a reserva, não.\\
+2. Existe alguma checagem da idade do cliente caso o filme seja proíbido\\
+para a idade dele?\\
+Sim\\
+3. Existe outra forma de pagamento além de dinheiro (cartões de béditos/\\
+créditos)?\\
+Não precisa gerenciar isto\\
+4. Existe assentos para cadeirantes?\\
+4 por sala\\
+\\
+Em qui., 2 de jul. de 2020 às 19:25, Murilo Ijanc' <mbsd@m0x.ru> escreveu:\\
+\\
+> Boa Noite Professor,\\
+>\\
+> Quanto ao software do cinema gostaria de saber:\\
+>\\
+> 1. Atualmente existe alguma forma de substituir a poltrona caso tenha\\
+> escolhido errada?\\
+> 2. Existe alguma checagem da idade do cliente caso o filme seja proíbido\\
+> para a idade dele?\\
+> 3. Existe outra forma de pagamento além de dinheiro (cartões de béditos/\\
+> créditos)?\\
+> 4. Existe assentos para cadeirantes?\\
+>\\
+> Obrigado pela atenção,\\
+>\\
+>\\
+> On Tue, 30 Jun 2020 at 20:20:05 -0300, Luciano Albuquerque Lima Saraiva\\
+> wrote:\\
+> > Oi Murilo. Entrou agora na minha caixa. 20:19. demora mas chega\\
+> >\\
+> > Em ter., 30 de jun. de 2020 às 19:58, Murilo Ijanc' <mbsd@m0x.ru>\\
+> escreveu:\\
+> >\\
+> > > Professor, esse e-mail é de teste somente para saber se caiu no spam!\\
+> > >\\
+> > > --\\
+> > > Murilo Ijanc'\\
+> > > https://m0x.ru\\
+> > >\\
 
 
-\textbf{Primeiro contato}:
-
-
-maillog.6.gz:Jul  1 00:58:56 lina smtpd[69372]: d289b56cd956a220 mta delivery evpid=74b2a2178a949108 from=<mbsd@m0x.ru> to=<llsaraiva@unaerp.br> rcpt=<-> source="46.23.94.11" relay="189.112.110.65 (mx01.unaerp.br)" delay=33m17s result="Ok" stat="250 2.6.0 message received"\\
-maillog.6.gz:Jul  1 01:20:01 lina smtpd[69372]: d289b574ed5dce6d smtp envelope evpid=87437c145382497f from=<llsaraiva@unaerp.br> to=<mbsd@m0x.ru>\\
-maillog.6.gz:Jul  1 01:20:01 lina smtpd[69372]: d289b575edaf635a mda delivery evpid=87437c145382497f from=<llsaraiva@unaerp.br> to=<mbsd@m0x.ru> rcpt=<mbsd@m0x.ru> user=mbsd delay=3s result=Ok stat=Delivered\\
-
-
-\textbf{Segundo contato}:
-
-
-maillog.4.gz:Jul  3 00:25:51 lina smtpd[69372]: d289b9ea2bbbc3c6 mta delivery evpid=1450d3d36a614eb1 from=<mbsd@m0x.ru> to=<llsaraiva@unaerp.br> rcpt=<-> source="46.23.94.11" relay="189.112.110.65 (mx01.unaerp.br)" delay=11s result="Ok" stat="250 2.6.0 message received"\\
-
-
-Com a necessidade de entrega de outros projetos antes desse foi priorizado essas
-entregas e por tanto as funciondalidades destacadas no decorrer desse projeto
-foram extrapoladas pela empresa contrante afim de pelo menos ter as funcionalidades
-básicas do sistema.
 
 \section{Requisitos funcionais}
 \subsection{[RF001] Escolha do filme}
@@ -203,7 +232,7 @@ O sistema deve calcular o total faturado por sala.
 
 O sistema deve calcular o número de lugares disponíveis por sala.
 
-\subsection{[RF008] Checagem de idade}
+\subsection{[RF009] Checagem de idade}
 
 \textbf{Prioridade}:
 \mbox{\ooalign{$\checkmark$\cr\hidewidth$\square$\hidewidth\cr}} Essencial
@@ -211,7 +240,17 @@ O sistema deve calcular o número de lugares disponíveis por sala.
 \mbox{\ooalign{\cr\hidewidth$\square$\hidewidth\cr}} Desejável
 
 O sistema deve receber o ano de nascimento do cliente quando o mesmo
-solicitar 
+solicitar meia entrada.
+
+\subsection{[RF010] Checagem de idade}
+
+\textbf{Prioridade}:
+\mbox{\ooalign{$\checkmark$\cr\hidewidth$\square$\hidewidth\cr}} Essencial
+\mbox{\ooalign{\cr\hidewidth$\square$\hidewidth\cr}} Importante
+\mbox{\ooalign{\cr\hidewidth$\square$\hidewidth\cr}} Desejável
+
+O sistema deve perguntar ao cliente se possui necessidades físicar
+e reservar o assento permitida para o mesmo.
 
 \section{Requisitos de Sistema}
 
@@ -279,6 +318,16 @@ para ajudar a instalar o sistema nas máquinas do Cinema.
 
 
 \section{Q.A}
+\begin{itemize}
+	\item O sistema deve responder em menos do que 3 segundos;
+	\item O sistema deve possuir pelo testes unitário em 90\% das funções;
+	\item O sistema deve ter controle de versionamento;
+	\item O sistema deve possuir um controle de integração como Travis;
+\end{itemize}
 
+
+\section{Protótipo}
+
+Todo o código fonte do protótipo pode ser obtido em \href{https://github.com/murilobsd/unaerp/tree/master/s1/eng\_soft/ativ\_p}{https://github.com/murilobsd/unaerp/tree/master/s1/eng\_soft/ativ\_p} bem como instruções para instalar.
 
 \end{document}
