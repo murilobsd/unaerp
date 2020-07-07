@@ -1,0 +1,284 @@
+% ET722A Luciano Albuquerque Lima Saraiva
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[onehalfspacing]{setspace}
+\usepackage[lmargin=3cm,tmargin=3cm,rmargin=2cm,bmargin=2cm]{geometry}
+\usepackage[brazil]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{indentfirst}
+\usepackage{comment}
+\usepackage{enumerate}
+\usepackage{hyperref}
+\usepackage{tabularx}
+\usepackage{subfig}
+\usepackage{glossaries}
+\usepackage{amssymb}
+
+% numeracao header
+\pagestyle{headings}
+
+% quebra de pagina por secao
+\let\oldsection\section 
+\renewcommand\section{\clearpage\oldsection}
+
+
+\begin{document}
+
+\begin{titlepage}
+	\begin{center}
+		\textbf{UNIVERSIDADE DE RIBEIRÃO PRETO} \\
+			CIÊNCIAS EXATAS \\
+			Engenharia de Software I
+
+			\vspace{1.5cm}
+
+			\textbf{Prof. Luciano A. L. Saraiva}
+			\vspace{0.5cm}
+
+			\textbf{Murilo da Silva Ijanc'} \\
+			RA: 834125
+
+			\vspace{6.5cm}
+
+			\textbf{ATIVIDADE FINAL} \\
+			\textbf{CINEMA SARAIVA}
+
+			\vfill
+
+			\vspace{0.8cm}
+
+			\includegraphics[width=0.2\textwidth]{unaerp}
+
+			\textbf{RIBEIRÃO PRETO} \\
+			\textbf{2020}
+	\end{center}
+\end{titlepage}
+
+
+\thispagestyle{empty}
+
+\tableofcontents
+
+\pagenumbering{arabic}
+
+% secao 1
+\section{Missão}
+O software visa solucionar a gestão dos assentos do \textbf{Cinema Saraiva}, bem
+como a elaboração de um relatório estatístico contendo informações relevantes para
+o proprietário tomada de decisão. O produto deve rodar em plataformas Unix da família
+BSD e com consumo de memória inferior a 16MB. A empresa se responsabiliza pelo
+desenvolvimento do software e agendamento de entrevista com o cliente, já o cliente
+necessita ter disponibilidade para as entrevistas que irão ser necessárias para o 
+desenvolvimento do software.
+
+\section{Entrevista}
+Primeiro a empresa entrou em contato com o cliente (01/07/2020) para um teste para ver se o
+mesmo recebia os emails, já que devido a pandemia atual não poderia realizar
+reuniões física.
+
+Após confirmado o recebimento do email de teste, foi levantado algumas questões
+para extrair informações que ajudariam no desenvolvimento das funcionalidades do 
+sistema e depois foram enviadas (03/07/2020), porêm as respostas não foram recebidas 
+por nossos servidores de email como pode ser visto no log abaixo.\\
+
+
+\textbf{Primeiro contato}:
+
+
+maillog.6.gz:Jul  1 00:58:56 lina smtpd[69372]: d289b56cd956a220 mta delivery evpid=74b2a2178a949108 from=<mbsd@m0x.ru> to=<llsaraiva@unaerp.br> rcpt=<-> source="46.23.94.11" relay="189.112.110.65 (mx01.unaerp.br)" delay=33m17s result="Ok" stat="250 2.6.0 message received"\\
+maillog.6.gz:Jul  1 01:20:01 lina smtpd[69372]: d289b574ed5dce6d smtp envelope evpid=87437c145382497f from=<llsaraiva@unaerp.br> to=<mbsd@m0x.ru>\\
+maillog.6.gz:Jul  1 01:20:01 lina smtpd[69372]: d289b575edaf635a mda delivery evpid=87437c145382497f from=<llsaraiva@unaerp.br> to=<mbsd@m0x.ru> rcpt=<mbsd@m0x.ru> user=mbsd delay=3s result=Ok stat=Delivered\\
+
+
+\textbf{Segundo contato}:
+
+
+maillog.4.gz:Jul  3 00:25:51 lina smtpd[69372]: d289b9ea2bbbc3c6 mta delivery evpid=1450d3d36a614eb1 from=<mbsd@m0x.ru> to=<llsaraiva@unaerp.br> rcpt=<-> source="46.23.94.11" relay="189.112.110.65 (mx01.unaerp.br)" delay=11s result="Ok" stat="250 2.6.0 message received"\\
+
+
+Com a necessidade de entrega de outros projetos antes desse foi priorizado essas
+entregas e por tanto as funciondalidades destacadas no decorrer desse projeto
+foram extrapoladas pela empresa contrante afim de pelo menos ter as funcionalidades
+básicas do sistema.
+
+\section{Requisitos funcionais}
+\subsection{[RF001] Escolha do filme}
+
+\textbf{Prioridade}:
+\mbox{\ooalign{$\checkmark$\cr\hidewidth$\square$\hidewidth\cr}} Essencial
+\mbox{\ooalign{\cr\hidewidth$\square$\hidewidth\cr}} Importante
+\mbox{\ooalign{\cr\hidewidth$\square$\hidewidth\cr}} Desejável
+
+O sistema deve permitir que o cliente do estabelecimento escolha os filmes disponíveis
+para a sala.
+
+\subsection{[RF002] Reserva de lugares}
+
+\textbf{Prioridade}:
+\mbox{\ooalign{$\checkmark$\cr\hidewidth$\square$\hidewidth\cr}} Essencial
+\mbox{\ooalign{\cr\hidewidth$\square$\hidewidth\cr}} Importante
+\mbox{\ooalign{\cr\hidewidth$\square$\hidewidth\cr}} Desejável
+
+O sistema deve permitir caso o assento esteja disponível o cliente selecioná-lo,
+a quantidade de assentos que o cliente pode selecionar é até o número máximo de
+assentos disponíveis da sala.
+
+
+\subsection{[RF003] Preço ingresso}
+
+\textbf{Prioridade}:
+\mbox{\ooalign{$\checkmark$\cr\hidewidth$\square$\hidewidth\cr}} Essencial
+\mbox{\ooalign{\cr\hidewidth$\square$\hidewidth\cr}} Importante
+\mbox{\ooalign{\cr\hidewidth$\square$\hidewidth\cr}} Desejável
+
+O sistema deve permitir o proprietário a adicionar o preço do valor do
+ingresso inteira, automaticamente o sistema deve dividir o preço da inteira
+pela metade computando assim o preço do ingresso inteiro e meia entrada.
+
+\subsection{[RF004] Tipo de entrada}
+
+\textbf{Prioridade}:
+\mbox{\ooalign{$\checkmark$\cr\hidewidth$\square$\hidewidth\cr}} Essencial
+\mbox{\ooalign{\cr\hidewidth$\square$\hidewidth\cr}} Importante
+\mbox{\ooalign{\cr\hidewidth$\square$\hidewidth\cr}} Desejável
+
+O sistema deve permitir que o cliente selecione meia ou entrada inteira.
+
+\subsection{[RF005] Visualização dos assentos da sala}
+
+\textbf{Prioridade}:
+\mbox{\ooalign{$\checkmark$\cr\hidewidth$\square$\hidewidth\cr}} Essencial
+\mbox{\ooalign{\cr\hidewidth$\square$\hidewidth\cr}} Importante
+\mbox{\ooalign{\cr\hidewidth$\square$\hidewidth\cr}} Desejável
+
+O sistema deve desenhar os assentos da sala em forma de uma matriz, cada
+linha identificada por uma letra do alfabeto A-Z e as colunas por números de
+1-9.
+
+\subsection{[RF005] Visualização dos assentos da sala}
+
+\textbf{Prioridade}:
+\mbox{\ooalign{$\checkmark$\cr\hidewidth$\square$\hidewidth\cr}} Essencial
+\mbox{\ooalign{\cr\hidewidth$\square$\hidewidth\cr}} Importante
+\mbox{\ooalign{\cr\hidewidth$\square$\hidewidth\cr}} Desejável
+
+O sistema deve desenhar os assentos da sala em forma de uma matriz, cada
+linha identificada por uma letra do alfabeto A-Z e as colunas por números de
+1-9.
+
+\subsection{[RF006] Número de ingressos meia/inteira por sala}
+
+\textbf{Prioridade}:
+\mbox{\ooalign{$\checkmark$\cr\hidewidth$\square$\hidewidth\cr}} Essencial
+\mbox{\ooalign{\cr\hidewidth$\square$\hidewidth\cr}} Importante
+\mbox{\ooalign{\cr\hidewidth$\square$\hidewidth\cr}} Desejável
+
+O sistema deve calcular o número de ingressos meia entrada e inteira por sala.
+
+\subsection{[RF007] Número total de ingressos por sala}
+
+\textbf{Prioridade}:
+\mbox{\ooalign{$\checkmark$\cr\hidewidth$\square$\hidewidth\cr}} Essencial
+\mbox{\ooalign{\cr\hidewidth$\square$\hidewidth\cr}} Importante
+\mbox{\ooalign{\cr\hidewidth$\square$\hidewidth\cr}} Desejável
+
+O sistema deve calcular o número total de ingressos por sala.
+
+\subsection{[RF008] Fatura por sala}
+
+\textbf{Prioridade}:
+\mbox{\ooalign{$\checkmark$\cr\hidewidth$\square$\hidewidth\cr}} Essencial
+\mbox{\ooalign{\cr\hidewidth$\square$\hidewidth\cr}} Importante
+\mbox{\ooalign{\cr\hidewidth$\square$\hidewidth\cr}} Desejável
+
+O sistema deve calcular o total faturado por sala.
+
+\subsection{[RF008] Número de lugares disponíveis por sala}
+
+\textbf{Prioridade}:
+\mbox{\ooalign{$\checkmark$\cr\hidewidth$\square$\hidewidth\cr}} Essencial
+\mbox{\ooalign{\cr\hidewidth$\square$\hidewidth\cr}} Importante
+\mbox{\ooalign{\cr\hidewidth$\square$\hidewidth\cr}} Desejável
+
+O sistema deve calcular o número de lugares disponíveis por sala.
+
+\subsection{[RF008] Checagem de idade}
+
+\textbf{Prioridade}:
+\mbox{\ooalign{$\checkmark$\cr\hidewidth$\square$\hidewidth\cr}} Essencial
+\mbox{\ooalign{\cr\hidewidth$\square$\hidewidth\cr}} Importante
+\mbox{\ooalign{\cr\hidewidth$\square$\hidewidth\cr}} Desejável
+
+O sistema deve receber o ano de nascimento do cliente quando o mesmo
+solicitar 
+
+\section{Requisitos de Sistema}
+
+\subsection{[RS001] Rodar plataforma UNIX}
+
+\textbf{Prioridade}:
+\mbox{\ooalign{\cr\hidewidth$\square$\hidewidth\cr}} Essencial
+\mbox{\ooalign{$\checkmark$\cr\hidewidth$\square$\hidewidth\cr}} Importante
+\mbox{\ooalign{\cr\hidewidth$\square$\hidewidth\cr}} Desejável
+
+O sistema deve rodar em plataformas UNIX da família \textbf{BSD}.
+
+\subsection{[RS002] Suporte teclado físico}
+
+\textbf{Prioridade}:
+\mbox{\ooalign{$\checkmark$\cr\hidewidth$\square$\hidewidth\cr}} Essencial
+\mbox{\ooalign{\cr\hidewidth$\square$\hidewidth\cr}} Importante
+\mbox{\ooalign{\cr\hidewidth$\square$\hidewidth\cr}} Desejável
+
+O sistema deve conseguir ler a entrada de dados pelo teclado físico.
+
+\subsection{[RS003] Salvar o status assentos}
+
+\textbf{Prioridade}:
+\mbox{\ooalign{$\checkmark$\cr\hidewidth$\square$\hidewidth\cr}} Essencial
+\mbox{\ooalign{\cr\hidewidth$\square$\hidewidth\cr}} Importante
+\mbox{\ooalign{\cr\hidewidth$\square$\hidewidth\cr}} Desejável
+
+O sistema deve conseguir recuperar os dados dos assentos em caso de falha, como
+por exemplo queda de energia.
+
+\section{Ciclo}
+
+A metodologia para o desenvolvimento foi \textbf{Cascata} por já saber
+quais requisitos eram necessário para geração do relatório.
+
+\subsection{Levantamento de requisitos}
+Apesar de não ter finalizado a comunicação para o levantamento de todos
+os requisitos, durante a primeira reunião já se obteve algumas funcionalidades
+necessárias para o funcionamento básico do sistema.
+
+\subsection{Planejamento}
+No planejamento definiu-se o tempo e o custo para o desenvolvimento dos
+requisitos do sistema bem como seriam acompanhado a implementação dessas
+funcionalidades.
+
+\subsection{Modelagem}
+Durante a modelagem foram decidos aspectos primordias quanto a aquitetura
+do sistema e a interface, por exemplo como seriam apresentados os assentos
+para o cliente. Como o proprietário quis diminuir os custos utilizando software
+livre o sistema teria que rodar na plataforma do mesmo.
+
+\subsection{Construção}
+O sistema foi desenvolvido na linguagem C, para manter mais fidedigno possível
+os desenvolvedores utilizaram em suas máquinas o mesmo sistema operacional que 
+roda nas máquinas do Cinema. Um script feito em shell é utilizado para testes
+unitários das funcionalidades internas do sistema, quando as funcionalidades
+externas aguardamos a execução pelo cliente.
+
+
+\subsection{Implementação}
+A implementação ainda será realiza após o testes realizados pelo cliente. Como
+foi decidido para automatiza o processo de implementação foi criado um Makefile
+para ajudar a instalar o sistema nas máquinas do Cinema.
+
+
+\section{Q.A}
+
+
+\end{document}
