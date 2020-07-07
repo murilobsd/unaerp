@@ -1,4 +1,4 @@
-![Travis (.org) branch](https://img.shields.io/travis/murilobsd/prov-labprog/master?style=for-the-badge)
+![Travis (.org) branch](https://img.shields.io/travis/murilobsd/unaerp/master?style=for-the-badge)
 [![license](https://img.shields.io/badge/License-BSD-blue.svg?style=for-the-badge)](LICENSE)
 
 # Lista de Atividades
