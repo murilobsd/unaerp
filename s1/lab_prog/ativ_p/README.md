@@ -1,6 +1,6 @@
 [![license](https://img.shields.io/badge/License-BSD-blue.svg?style=for-the-badge)](LICENSE)
 
-# Atividade Final
+# Atividade Parcial
 
 ## Testado em:
 
@@ -46,3 +46,8 @@ $ mupdf doc/doc.pdf
 - [x] Exercício 3
 - [x] Exercício 4
 - [x] Exercício 5
+- [x] Exercício 6
+- [x] Exercício 7
+- [x] Exercício 8
+- [x] Exercício 9
+- [x] Exercício 10
