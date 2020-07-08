@@ -1,0 +1,8 @@
+# tex
+*.lof
+*.log
+*.out
+*.toc
+*.aux
+*.mkv
+doc/doc.pdf
