@@ -26,3 +26,4 @@ semestre -> matéria -> tipo de atividade
 - [ ] [Geomtria Analítica](./s1/ga/)
 	- [x] [Atividade Parcial](./s1/ga/ativ_p)
 	- [ ] [Atividade Final](./s1/ga/ativ_f)
+- [x] [Projeto Integrador](./s1/pro_inte/)
