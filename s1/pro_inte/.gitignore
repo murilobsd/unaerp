@@ -1,0 +1,8 @@
+# bin
+
+# tex
+*.lof
+*.log
+*.out
+*.toc
+*.aux
