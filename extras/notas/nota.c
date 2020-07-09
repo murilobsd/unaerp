@@ -39,65 +39,88 @@
         "Safari/537.36"
 
 /* usuario e senha */
-#define USER "123456"
-#define PASS "123456789"
+#ifdef RA
+#define USER RA
+#define PASS RAS
+#else
+#define USER "usuario"
+#define PASS "senha"
+#endif
+
 #define FAUT "usuario=%s&senha=%s"
 
 /* urls */
 #define UAUTH "https://www3.unaerp.br/aluno/rs/aluno-online"
 
+/* json key */
+#define JCRED "credencial"
+
+static int 	un_init_nota(CURL *, struct curl_slist *, const char *);
+static int 	un_auth_nota(CURL *, struct curl_slist *, const char *,
+    const char *, const char *);
+static int 	get_credentials(const char *, char **, size_t *);
+
 int
 main(int argc, char *argv[])
 {
-	/* curl */
 	CURL 			*curl = NULL;
-	CURLcode res;
-	/* header list */
-	struct curl_slist 	*headers = NULL;
-	/* url auth */
-	const char 		*url_auth = UAUTH;
-	/* data form */
-	char 			fdata[256];
-	int 			ret;
+	struct curl_slist 	*headers = NULL;	/* header list */
+	const char 		*url = UAUTH; 		/* url auth */
+	int 			ret = 0;
+	char			*cred = NULL;		/* token */
+	size_t			credsz = 0;		/* token size */
 
-	/* 'clean' fdata */
-	memset(fdata, 0, sizeof(fdata));
 	/* inicializa o curl */
 	curl = curl_easy_init();
-	/* setamos cookkie para memória */
-	curl_easy_setopt(curl, CURLOPT_COOKIEFILE, "");
-	/* adicionamos o user agent */
-	curl_easy_setopt(curl, CURLOPT_USERAGENT, HUSE_AGEN);
 
 	/*
 	 * Fase 1 GET Autenticação SESSION
+	if ((ret = un_init_nota(curl, headers, url)) != 0)
+		goto clean;
 	 */
-
-	/* adicionamos os headers */
-	headers = curl_slist_append(headers, HSEC_DESD);
-	headers = curl_slist_append(headers, HSEC_FETU);
-	headers = curl_slist_append(headers, HSEC_MODN);
-	headers = curl_slist_append(headers, HSEC_SITE);
-
-	/* adicionamos o header ao request */
-	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-
-	if (curl) {
-		/* adicionamos a url da autenticação */
-		curl_easy_setopt(curl, CURLOPT_URL, url_auth);
-		/* request */
-		res = curl_easy_perform(curl);
-		if (res != CURLE_OK)
-			fprintf(stderr, "curl error: %s",
-			    curl_easy_strerror(res));
-	}
 
 	/*
 	 * Fase 2 POST Autenticação
+	headers = NULL;
+	if ((ret = un_auth_nota(curl, headers, url, USER, PASS)) != 0)
+		goto clean;
 	 */
 
-	/* limpamos o header para adicionar outros */
-	headers = NULL;
+	/* Obtenho a credencial de autenticação */
+	if ((ret = get_credentials("./resp_auth.json", &cred, &credsz)) != 0)
+		goto clean;
+	
+	printf("Credencial: %s Tamanho: %lu\n", cred, credsz);
+
+	/* TODO: Registrar o acesso */
+
+	/* TODO: Obter Boletim */
+
+	/* TODO: Parsear dados do boletim */
+
+clean:
+
+	/* limpaoas as crdenciais */
+	if (cred != NULL) free(cred);
+
+	/* liberamos a lista ao termino do request */
+	curl_slist_free_all(headers);
+
+	/* limpamos o curl */
+	curl_easy_cleanup(curl);
+	return (ret);
+}
+
+static int
+un_auth_nota(CURL *curl, struct curl_slist *headers, const char *url,
+    const char *ra, const char *passwd)
+{
+	char 		fdata[256];
+	int 		ret = 0;
+	CURLcode 	res;
+
+	/* 'clean' fdata */
+	memset(fdata, 0, sizeof(fdata));
 
 	headers = curl_slist_append(headers, HEAD_CRED);
 	headers = curl_slist_append(headers, HEAD_ORIG);
@@ -115,14 +138,14 @@ main(int argc, char *argv[])
 	if (curl) {
 		/* TODO: encodar os dados */
 		/* criamos os dados a serem submetidos */
-		ret = snprintf(fdata, sizeof(fdata), FAUT, USER, PASS);
+		ret = snprintf(fdata, sizeof(fdata), FAUT, ra, passwd);
 		if (ret < 0 || ret >= sizeof(fdata)) {
 			fprintf(stderr, "fdata size is big\n");
-			goto clean;
+			ret = 1;
 		}
 
 		/* adicionamos a url da autenticação */
-		curl_easy_setopt(curl, CURLOPT_URL, url_auth);
+		curl_easy_setopt(curl, CURLOPT_URL, url);
 		/* setamos o tamanho do dos dados do form */
 		curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(fdata));
 		/* setamos os dados do formulario no request */
@@ -130,44 +153,95 @@ main(int argc, char *argv[])
 
 		/* request */
 		res = curl_easy_perform(curl);
-		if (res != CURLE_OK)
+		if (res != CURLE_OK) {
 			fprintf(stderr, "curl error: %s",
 			    curl_easy_strerror(res));
+			ret = 1;
+		}
 	}
 
-clean:
-	/* liberamos a lista ao termino do request */
-	curl_slist_free_all(headers);
-
-	/* limpamos o curl */
-	curl_easy_cleanup(curl);
-	return (0);
+	return (ret);
 }
 
+static int
+un_init_nota(CURL *curl, struct curl_slist *headers, const char *url)
+{
+	CURLcode 	res;
+	int 		ret = 0;
 
-/*
+	/* setamos cookkie para memória */
+	curl_easy_setopt(curl, CURLOPT_COOKIEFILE, "");
+	/* adicionamos o user agent */
+	curl_easy_setopt(curl, CURLOPT_USERAGENT, HUSE_AGEN);
 
-	struct json_object *json_info;
-	struct json_object *json_file = NULL;
-	struct json_object *nome;
+	/* adicionamos os headers */
+	headers = curl_slist_append(headers, HSEC_DESD);
+	headers = curl_slist_append(headers, HSEC_FETU);
+	headers = curl_slist_append(headers, HSEC_MODN);
+	headers = curl_slist_append(headers, HSEC_SITE);
 
-	CURL curl;
-	CURLcode res;
+	/* adicionamos o header ao request */
+	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
-	json_file = json_object_from_file("./resp_auth.json");
+	if (curl) {
+		/* adicionamos a url da autenticação */
+		curl_easy_setopt(curl, CURLOPT_URL, url);
+		/* request */
+		res = curl_easy_perform(curl);
+		if (res != CURLE_OK) {
+			fprintf(stderr, "curl error: %s",
+			    curl_easy_strerror(res));
+			ret = 1;
+		}
+	}
+
+	return (ret);
+
+}
+
+static int
+get_credentials(const char *from, char **to, size_t *tosz)
+{
+	int 			 ret = 0;
+	struct json_object 	*base = NULL;
+	struct json_object 	*cred = NULL;
+	size_t			 credsz = 0;
+
+	base = json_object_from_file(from);
 
 	if (json_util_get_last_err() != NULL) {
-		printf("Failed parse: %s - %s", json_util_get_last_err(), "resp_auth.json");
-		return (1);
-	}
-
-	if (json_file == NULL) {
+		printf("Failed parse: %s - %s", json_util_get_last_err(),
+		    "resp_auth.json");
+		ret = 1;
+	} else if (base == NULL) {
 		printf("Failed parse");
-		return (1);
+		ret = 1;	
+	} else {
+		json_object_object_get_ex(base, JCRED, &cred);
+
+		const char *cred_str = json_object_get_string(cred);
+		credsz = strlen(cred_str);
+
+		if (credsz <= 0) {
+			printf("Credencial não encontradas: %s\n", from);
+			ret = 1;
+		} else {
+			*to = (char *)malloc(credsz + 2);
+			if (*to == NULL) {
+				printf("Failed malloc credentials\n");
+				ret = 1;
+			} else {
+				*tosz = credsz + 1;
+				if(strlcpy(*to, cred_str, credsz+1) >= credsz + 2) {
+					printf("buffer pequeno\n");
+					ret = 1;
+				}
+			}
+		}
 	}
-	json_object_object_get_ex(json_file, "informacoes", &json_info);
 
-	json_object_object_get_ex(json_info, "nome", &nome);
+	if (base != NULL)
+		json_object_put(base);
 
-	printf("Nome: %s\n", json_object_get_string(nome));
-*/
+	return (ret);
+}
