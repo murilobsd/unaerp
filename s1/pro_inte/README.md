@@ -1,4 +1,4 @@
-<p style="align-center">
+<p align="center">
 	<img src="https://github.com/murilobsd/unaerp/blob/master/s1/pro_inte/cliente/assets/logo.png">
 </p>
 
