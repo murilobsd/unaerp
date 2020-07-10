@@ -47,18 +47,28 @@
 #define PASS "senha"
 #endif
 
+
+/* cados de formulario */
 #define FAUT "usuario=%s&senha=%s"
+#define FRET "modulo=apresentacao&credencial=%s"
 
 /* urls */
 #define UAUTH "https://www3.unaerp.br/aluno/rs/aluno-online"
+#define UREGI "https://www3.unaerp.br/aluno/rs/aluno-online/registrar-acesso"
 
 /* json key */
+#define JAVPA "avaliacaoParcial"
+#define JAVFI "avaliacaoFinal"
 #define JCRED "credencial"
+#define JDISC "disciplina"
+#define JNOME "nome"
+#define JNOTS "notas"
 
 static int 	un_init_nota(CURL *, struct curl_slist *, const char *);
 static int 	un_auth_nota(CURL *, struct curl_slist *, const char *,
     const char *, const char *);
 static int 	get_credentials(const char *, char **, size_t *);
+static int	get_boletim(const char *);
 
 int
 main(int argc, char *argv[])
@@ -90,13 +100,15 @@ main(int argc, char *argv[])
 	if ((ret = get_credentials("./resp_auth.json", &cred, &credsz)) != 0)
 		goto clean;
 	
-	printf("Credencial: %s Tamanho: %lu\n", cred, credsz);
+	/* printf("Credencial: %s Tamanho: %lu\n", cred, credsz); */
 
 	/* TODO: Registrar o acesso */
 
 	/* TODO: Obter Boletim */
 
-	/* TODO: Parsear dados do boletim */
+	/* Parsear dados do boletim */
+	if ((ret = get_boletim("./resp_nota.json")) != 0)
+		goto clean;
 
 clean:
 
@@ -111,6 +123,110 @@ clean:
 	return (ret);
 }
 
+/*
+ * Get boletim.
+ */
+static int
+get_boletim(const char *from)
+{
+	int 			 ret = 0;
+	int			 notassz = 0;
+	struct json_object 	*base = NULL;
+	struct json_object	*nota = NULL;
+	struct json_object	*notas = NULL;
+	struct json_object 	*discp = NULL;
+	struct json_object	*nome = NULL;
+	struct json_object	*atap = NULL;
+	int i;
+
+	base = json_object_from_file(from);
+
+	if (json_util_get_last_err() != NULL) {
+		printf("Failed parse: %s - %s", json_util_get_last_err(),
+		    "resp_note.json");
+		ret = 1;
+	} else if (base == NULL) {
+		printf("Failed parse");
+		ret = 1;	
+	} else {
+		json_object_object_get_ex(base, JNOTS, &notas);
+
+		/* tamanho do array notas */
+		notassz = json_object_array_length(notas);
+
+		for (i = 0; i < notassz; i++) {
+			nota = json_object_array_get_idx(notas, i);
+			json_object_object_get_ex(nota, JDISC, &discp);
+			json_object_object_get_ex(discp, JNOME, &nome);
+			json_object_object_get_ex(nota, JAVPA, &atap);
+
+			printf("Disciplina: %s Atividade Parcial: %s\n",
+			    json_object_get_string(nome),
+			    json_object_get_string(atap));
+		}
+
+	}
+
+	if (base != NULL)
+		json_object_put(base);
+
+	return (ret);
+}
+
+/*
+ * Retorna o token obtido na autenticação, esse token tem que ser usado
+ * nos próximos requests.
+ */
+static int
+get_credentials(const char *from, char **to, size_t *tosz)
+{
+	int 			 ret = 0;
+	size_t			 credsz = 0;
+	struct json_object 	*base = NULL;
+	struct json_object 	*cred = NULL;
+
+	base = json_object_from_file(from);
+
+	if (json_util_get_last_err() != NULL) {
+		printf("Failed parse: %s - %s", json_util_get_last_err(),
+		    "resp_auth.json");
+		ret = 1;
+	} else if (base == NULL) {
+		printf("Failed parse");
+		ret = 1;	
+	} else {
+		json_object_object_get_ex(base, JCRED, &cred);
+
+		const char *cred_str = json_object_get_string(cred);
+		credsz = strlen(cred_str);
+
+		if (credsz <= 0) {
+			printf("Credencial não encontradas: %s\n", from);
+			ret = 1;
+		} else {
+			*to = (char *)malloc(credsz + 2);
+			if (*to == NULL) {
+				printf("Failed malloc credentials\n");
+				ret = 1;
+			} else {
+				*tosz = credsz + 1;
+				if(strlcpy(*to, cred_str, credsz+1) >= credsz + 2) {
+					printf("buffer pequeno\n");
+					ret = 1;
+				}
+			}
+		}
+	}
+
+	if (base != NULL)
+		json_object_put(base);
+
+	return (ret);
+}
+
+/*
+ * Método que realiza a autenticação no sistema do Aluno Online
+ */
 static int
 un_auth_nota(CURL *curl, struct curl_slist *headers, const char *url,
     const char *ra, const char *passwd)
@@ -163,6 +279,10 @@ un_auth_nota(CURL *curl, struct curl_slist *headers, const char *url,
 	return (ret);
 }
 
+/*
+ * Somente realiza um request GET para obter os cookies que serão usados
+ * no decorret de outros requests.
+ */
 static int
 un_init_nota(CURL *curl, struct curl_slist *headers, const char *url)
 {
@@ -197,51 +317,4 @@ un_init_nota(CURL *curl, struct curl_slist *headers, const char *url)
 
 	return (ret);
 
-}
-
-static int
-get_credentials(const char *from, char **to, size_t *tosz)
-{
-	int 			 ret = 0;
-	struct json_object 	*base = NULL;
-	struct json_object 	*cred = NULL;
-	size_t			 credsz = 0;
-
-	base = json_object_from_file(from);
-
-	if (json_util_get_last_err() != NULL) {
-		printf("Failed parse: %s - %s", json_util_get_last_err(),
-		    "resp_auth.json");
-		ret = 1;
-	} else if (base == NULL) {
-		printf("Failed parse");
-		ret = 1;	
-	} else {
-		json_object_object_get_ex(base, JCRED, &cred);
-
-		const char *cred_str = json_object_get_string(cred);
-		credsz = strlen(cred_str);
-
-		if (credsz <= 0) {
-			printf("Credencial não encontradas: %s\n", from);
-			ret = 1;
-		} else {
-			*to = (char *)malloc(credsz + 2);
-			if (*to == NULL) {
-				printf("Failed malloc credentials\n");
-				ret = 1;
-			} else {
-				*tosz = credsz + 1;
-				if(strlcpy(*to, cred_str, credsz+1) >= credsz + 2) {
-					printf("buffer pequeno\n");
-					ret = 1;
-				}
-			}
-		}
-	}
-
-	if (base != NULL)
-		json_object_put(base);
-
-	return (ret);
 }
