@@ -20,10 +20,10 @@ semestre -> matéria -> tipo de atividade
 - [ ] [Iteração Humano Computador](./s1/ihc/)
 	- [x] [Atividade Parcial](./s1/ihc/ativ_p)
 	- [ ] Atividade Final
-- [ ] [Lógica e Criatividade](./s1/log_cria/)
+- [x] [Lógica e Criatividade](./s1/log_cria/)
 	- [x] [Atividade Parcial](./s1/log_cria/ativ_p)
-	- [ ] Atividade Final
-- [ ] [Geomtria Analítica](./s1/ga/)
+	- [x] [Atividade Final](./s1/log_cria/ativ_f)
+- [x ] [Geomtria Analítica](./s1/ga/)
 	- [x] [Atividade Parcial](./s1/ga/ativ_p)
-	- [ ] [Atividade Final](./s1/ga/ativ_f)
+	- [x] [Atividade Final](./s1/ga/ativ_f)
 - [x] [Projeto Integrador](./s1/pro_inte/)
