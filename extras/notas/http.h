@@ -18,9 +18,7 @@
 
 enum http_method {
 	GET,
-	POST,
-
-	NOT_METHOD,
+	POST
 };
 
 struct res {
@@ -33,6 +31,8 @@ struct req {
 	enum http_method	 method;
 	CURL 		 	*curl;
 	char			*url;
+	char			*data;
+	size_t			 datasz;
 	struct curl_slist	*headers;
 	int			 timeout;
 	long	 		 status_code;
@@ -43,5 +43,6 @@ struct req 	*req_init(void);
 int		 req_set_url(struct req *, const char *, size_t);
 int		 req_set_method(struct req *, enum http_method);
 int		 req_add_header(struct req *, const char *);
+int		 req_set_data(struct req *, const char *);
 void		 req_do(struct req *);
 void		 req_free(struct req *);

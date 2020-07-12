@@ -46,14 +46,20 @@ req_do(struct req *r)
 	}
 
 
+	//curl_easy_setopt(r->curl, CURLOPT_VERBOSE, 1L);
 	curl_easy_setopt(r->curl, CURLOPT_URL, (const char *)r->url);
 	curl_easy_setopt(r->curl, CURLOPT_HTTPHEADER, r->headers);
 	curl_easy_setopt(r->curl, CURLOPT_WRITEFUNCTION, recv_cb);
 	curl_easy_setopt(r->curl, CURLOPT_WRITEDATA, (void *)r);
 
 	switch (r->method) {
-	GET:
+	case GET:
 		curl_easy_setopt(r->curl, CURLOPT_HTTPGET, 1L);
+		break;
+	case POST:
+		curl_easy_setopt(r->curl, CURLOPT_POST, 1L);
+		curl_easy_setopt(r->curl, CURLOPT_POSTFIELDSIZE, r->datasz);
+		curl_easy_setopt(r->curl, CURLOPT_POSTFIELDS, r->data);
 		break;
 	default:
 		break;
@@ -68,6 +74,30 @@ req_do(struct req *r)
 	curl_easy_getinfo(r->curl, CURLINFO_RESPONSE_CODE, &r->status_code);
 
 	printf("[%s] - %s - %lu\n", m, r->url, r->status_code);
+}
+
+int
+req_set_data(struct req *r, const char *d)
+{
+	size_t datasz = 0;
+
+	if (r == NULL) {
+		printf("req_set_data req is null\n");
+		return (1);
+	}
+
+	datasz = strlen(d);
+
+	if (r->data != NULL)
+		free(r->data);
+
+	r->data = (char *)malloc(datasz + 1);
+	r->datasz = datasz;
+
+	memset(r->data, '\0', datasz + 1);
+	memcpy(r->data, d, datasz);
+
+	return (0);
 }
 
 int
@@ -96,32 +126,23 @@ req_set_method(struct req *r, enum http_method m)
 int
 req_set_url(struct req *r, const char *u, size_t sz)
 {
-	int ret = 0;
 	int res = 0;
 
 	if (r == NULL) {
 		printf("req_set_url req is null\n");
-		ret = 1;
+		goto clean;
 	}
 
-	r->url = malloc(sz);
+	r->url = strndup(u, sz);
 	if (r->url == NULL) {
-		printf("req_set_url malloc\n");
-		ret = 1;
+		printf("req_set_url strdup\n");
+		goto clean;
 	}
 
-	res = strlcpy(r->url, u, sz);
-	if (res >= sz) {
-		printf("url is too long: %d\n", res);
-		ret = 1;
-	}
-	r->url[res] = '\0';
-
-	return (ret);
+	return (0);
 clean:
 	if (r->url != NULL) free(r->url);
-
-	return (ret);
+	return (1);
 }
 
 struct req *
@@ -146,6 +167,8 @@ req_init(void)
 
 	r->method = GET;
 	r->headers = NULL;
+	r->data = NULL;
+	r->datasz = 0;
 	r->status_code = 0;
 	r->resp.content = NULL;
 	r->resp.size = 0;
@@ -167,6 +190,8 @@ req_free(struct req *r)
 		curl_easy_cleanup(r->curl);
 		curl_global_cleanup();
 	}
+	if (r->data != NULL)
+		free(r->data);
 	if (r != NULL)
 		free(r);
 
