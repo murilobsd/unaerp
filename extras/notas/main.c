@@ -1,42 +1,55 @@
-#include <stdio.h>
-#include <string.h>
+/*
+ * Copyright (c) 2020 Murilo Ijanc' <mbsd@m0x.ru>
+ *
+ * Permission to use, copy, modify, and distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
 
-#include "http.h"
+#include <err.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <limits.h>
+
+#include "unaerp.h"
+
+extern char *__progname;
+
+static void usage(void);
 
 int
 main(int argc, char *argv[])
 {
-	struct req 	*r = NULL;
-	const char 	*urlg = "https://httpbin.org/get";
-	const char 	*urlp = "http://httpbin.org/post";
-	const char	*dataform = "usuario=teste&senha=teste";
-	size_t 		 urlgsz = strlen(urlg);
-	size_t 		 urlpsz = strlen(urlp);
+	const char 	*errp = NULL;
+	int 		 ra = 0;
 
-	/* init request */
-	r = req_init();
+	argc -= 1;
+	argv += 1;
 
-	/* method get  */
-	/* req_set_url(r, "https://httpbin.org/get", urlg); */
-	/* req_set_method(r, GET); */
+	if (argc != 2)
+		usage();
 
-	/* method post form */
-	req_set_url(r, urlp, urlpsz);
-	req_set_method(r, POST);
-	req_set_data(r, dataform);
+	ra = strtonum(argv[0], 1, INT_MAX, &errp);
+	if (errp)
+		errx(1, "invalid ra number");
 
-	/* add header */
-	req_add_header(r, "X-UserAgent: unaerp/0.1");
-
-	//http_add_params(r, "Accept: application/json;");
-	//http_add_data(r, "Accept: application/json;");
-
-	/* requesting.,.*/
-	req_do(r);
-	if (r->status_code == 200) {
-		printf("Response: %s\n", r->resp.content);
-	}
-	req_free(r);
+	get_boletim(argv[0], argv[1]);
 
 	return (0);
+}
+
+static void
+usage(void)
+{
+	fprintf(stderr, "usage: %s <ra number> <password>\n", __progname);
+	exit(2);
 }
