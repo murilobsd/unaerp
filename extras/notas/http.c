@@ -29,7 +29,7 @@ static const char 	*get_meth(enum http_method);
 static size_t		 recv_cb(char *, size_t, size_t, void *);
 
 void
-req_do(struct req *r)
+http_do(struct req *r)
 {
 	struct res  resp;
 	const char *m = get_meth(r->method);
@@ -47,6 +47,8 @@ req_do(struct req *r)
 
 
 	//curl_easy_setopt(r->curl, CURLOPT_VERBOSE, 1L);
+	curl_easy_setopt(r->curl, CURLOPT_FOLLOWLOCATION, 1L);
+	curl_easy_setopt(r->curl, CURLOPT_COOKIEFILE, "");
 	curl_easy_setopt(r->curl, CURLOPT_URL, (const char *)r->url);
 	curl_easy_setopt(r->curl, CURLOPT_HTTPHEADER, r->headers);
 	curl_easy_setopt(r->curl, CURLOPT_WRITEFUNCTION, recv_cb);
@@ -67,13 +69,54 @@ req_do(struct req *r)
 
 	r->res = curl_easy_perform(r->curl);
 	if (r->res != CURLE_OK) {
-		printf("req_do: %s\n", curl_easy_strerror(r->res));
+		printf("http_do: %s\n", curl_easy_strerror(r->res));
 		r->status_code = 500;
 		return;
 	}
 	curl_easy_getinfo(r->curl, CURLINFO_RESPONSE_CODE, &r->status_code);
 
 	printf("[%s] - %s - %lu\n", m, r->url, r->status_code);
+}
+
+int
+http_post(struct req *r, const char *u, const char *d)
+{
+	req_set_url(r, u, strlen(u));
+	req_set_method(r, POST);
+	req_set_data(r, d);
+	http_do(r);
+
+	return (0);
+}
+
+struct json_object *
+http_resp_json(struct req *r)
+{
+	struct json_object *j = NULL;
+
+	if (r == NULL) {
+		printf("req_set_method req is null\n");
+		return NULL;
+	}
+	if (r->resp.content == NULL) {
+		printf("http_resp_json resp is null\n");
+		return NULL;
+	}
+
+	j = json_tokener_parse(r->resp.content);
+
+	return j;
+}
+
+
+int
+http_get(struct req *r, const char *u)
+{
+	req_set_url(r, u, strlen(u));
+	req_set_method(r, GET);
+	http_do(r);
+
+	return (0);
 }
 
 int
