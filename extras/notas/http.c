@@ -31,20 +31,20 @@ static size_t		 recv_cb(char *, size_t, size_t, void *);
 void
 http_do(struct req *r)
 {
-	struct res  resp;
-	const char *m = get_meth(r->method);
+	const char *m = NULL;
+
+	if (r == NULL || r->curl == NULL) {
+		printf("req_set_url req is null\n");
+		return;
+	}
 
 	if (r->resp.content != NULL)
 		free(r->resp.content);
 
 	r->resp.content = NULL;
 	r->resp.size = 0;
-
-	if (r == NULL) {
-		printf("req_set_url req is null\n");
-		return;
-	}
-
+	r->res = CURLE_OK;
+	m = get_meth(r->method);
 
 	//curl_easy_setopt(r->curl, CURLOPT_VERBOSE, 1L);
 	curl_easy_setopt(r->curl, CURLOPT_FOLLOWLOCATION, 1L);
@@ -75,7 +75,7 @@ http_do(struct req *r)
 	}
 	curl_easy_getinfo(r->curl, CURLINFO_RESPONSE_CODE, &r->status_code);
 
-	printf("[%s] - %s - %lu\n", m, r->url, r->status_code);
+	//printf("[%s] - %s - %lu\n", m, r->url, r->status_code);
 }
 
 int
@@ -169,8 +169,6 @@ req_set_method(struct req *r, enum http_method m)
 int
 req_set_url(struct req *r, const char *u, size_t sz)
 {
-	int res = 0;
-
 	if (r == NULL) {
 		printf("req_set_url req is null\n");
 		goto clean;
@@ -198,8 +196,9 @@ req_init(void)
 		printf("req_init alloc failed\n");
 		return NULL;
 	}
+	r->curl = NULL;
 
-	curl_global_init(CURL_GLOBAL_ALL);
+	//curl_global_init(CURL_GLOBAL_ALL);
 	r->curl = curl_easy_init();
 	if (r->curl == NULL) {
 		printf("rw_init curl failed\n");
@@ -208,13 +207,14 @@ req_init(void)
 	}
 
 
-	r->method = GET;
-	r->headers = NULL;
 	r->data = NULL;
 	r->datasz = 0;
-	r->status_code = 0;
+	r->headers = NULL;
+	r->method = GET;
+	r->res = CURLE_OK;
 	r->resp.content = NULL;
 	r->resp.size = 0;
+	r->status_code = 0;
 	r->timeout = 20;
 
 	return (r);
@@ -223,25 +223,31 @@ req_init(void)
 void
 req_free(struct req *r)
 {
-	if (r->url != NULL)
-		free(r->url);
+	if (r == NULL) return;
+
+	curl_slist_free_all(r->headers);
+	curl_easy_cleanup(r->curl);
+
 	if (r->resp.content != NULL)
 		free(r->resp.content);
-	if (r->headers != NULL)
-		curl_slist_free_all(r->headers);
-	if (r->curl != NULL) {
-		curl_easy_cleanup(r->curl);
-		curl_global_cleanup();
-	}
+	if (r->url != NULL)
+		free(r->url);
 	if (r->data != NULL)
 		free(r->data);
 	if (r != NULL)
 		free(r);
 
+	r->curl = NULL;
+	r->res = CURLE_OK;
 	r->url = NULL;
 	r->headers = NULL;
+	r->data= NULL;
+	r->datasz = 0;
+	r->status_code = 0;
 	r->resp.content = NULL;
 	r->resp.size = 0;
+	r->timeout = 0;
+	r = NULL;
 }
 
 static const char *

@@ -4,7 +4,8 @@
 CFLAGS	= -O0 $(PIPE) $(DEBUG)
 .endif
 
-CFLAGS	+= -I/usr/local/include
+CFLAGS	+= -I/usr/local/include \
+	-Wall -Werror
 LDADD 	+= -L/usr/local/lib -lcurl -ljson-c
 
 .c.o:
