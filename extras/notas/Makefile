@@ -4,14 +4,14 @@
 CFLAGS	= -O0 $(PIPE) $(DEBUG)
 .endif
 
-CFLAGS	+= -I/usr/local/include 
-LDADD 	+= -L/usr/local/lib -lcurl
+CFLAGS	+= -I/usr/local/include
+LDADD 	+= -L/usr/local/lib -lcurl -ljson-c
 
 .c.o:
 	${CC} ${CFLAGS} -c $<
 
-main: http.o main.o
-	${CC} ${CFLAGS} ${LDADD} -o $@ main.o http.o
+unaerp: http.o unaerp.o main.o
+	${CC} ${CFLAGS} ${LDADD} -o $@ http.o unaerp.o main.o
 
 clean:
-	rm -f main *.o
+	rm -f unaerp *.o *.core
