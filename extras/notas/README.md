@@ -4,7 +4,7 @@
 
 Programa para obter as notas do boletim de um determinado aluno.
 
-<p align="center>
+<p align="center">
 <img alt="notas saida" src="https://github.com/murilobsd/unaerp/raw/master/extras/notas/notas.png">
 </p>
 
