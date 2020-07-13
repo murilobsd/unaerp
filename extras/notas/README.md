@@ -4,7 +4,9 @@
 
 Programa para obter as notas do boletim de um determinado aluno.
 
-![notas saida](./notas.png "Saída das notas")
+<p align="center>
+<img alt="notas saida" src="https://github.com/murilobsd/unaerp/raw/master/extras/notas/notas.png">
+</p>
 
 ## Requisitos
 
@@ -23,7 +25,7 @@ $ make unaerp
 $ ./unaerp <ra number> <password>
 $ ./unaerp 123456 123456
 Disciplina: ENGENHARIA DE SOFTWARE I Atividade Parcial: 10,0
-Disciplina: INTERACAO HUMANO COMPUTADOR Atividade Parcial: 8,5
+Disciplina: INTERACAO HUMANO COMPUTADOR Atividade Parcial: 9,5
 ,,,
 ```
 
